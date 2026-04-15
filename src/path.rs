@@ -15,7 +15,7 @@ impl core::str::FromStr for BIP32Path {
     /// Create a BIP32Path form string literals.
     fn from_str(path: &str) -> Result<Self, Self::Err> {
         let mut paths = Vec::new();
-        let path = path.replace("/", "\n");
+        let path = path.replace('/', "\n");
 
         for p in path.lines() {
             if p != "m" {
@@ -88,3 +88,4 @@ impl From<Vec<u32>> for BIP32Path {
         BIP32Path(vector)
     }
 }
+

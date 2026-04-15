@@ -1,21 +1,24 @@
 [package]
+authors = ["Ngo Iok Ui <wusyong9104@gmail.com>", "Vlad Savchyn"]
+description = "SLIP-0010 : ed25519 private key derivation from master private key"
+edition = "2021"
+keywords = ["slip-0010", "slip-10", "slip10"]
+license = "MIT"
 name = "slip10"
-version = "0.4.3"
-authors = ["Ngo Iok Ui <wusyong9104@gmail.com>"]
-edition = "2018"
-description = "SLIP-0010 : Universal private key derivation from master private key"
-homepage = "https://github.com/wusyong/slip10"
-repository = "https://github.com/wusyong/slip10"
-documentation = "https://docs.rs/slip10"
-license = "Apache-2.0 OR MIT"
 readme = "README.md"
+version = "0.4.7"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies.ed25519-dalek]
+default-features = false
+version = "2"
 
-[dependencies]
-ed25519-dalek = { version = "1.0", default-features = false, features = ["u64_backend"] }
-hmac = { version = "0.9", default-features = false }
-sha2 = { version = "0.9", default-features = false }
+[dependencies.hmac]
+default-features = false
+version = "0.9"
 
-[dev-dependencies]
-hex = "0.4"
+[dependencies.sha2]
+default-features = false
+version = "0.9"
+
+[dev-dependencies.hex]
+version = "0.4"
