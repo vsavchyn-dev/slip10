@@ -1,6 +1,6 @@
 use core::str::FromStr;
 
-use slip10::BIP32Path;
+use near_slip10::BIP32Path;
 
 const HARDEND: u32 = 1 << 31;
 
@@ -110,3 +110,4 @@ fn test_parse_path() {
         assert!(BIP32Path::from_str(i).is_err());
     }
 }
+

@@ -1,10 +1,11 @@
 [package]
-authors = ["Ngo Iok Ui <wusyong9104@gmail.com>", "Vlad Savchyn"]
-description = "SLIP-0010 : ed25519 private key derivation from master private key"
+authors = ["Ngo Iok Ui <wusyong9104@gmail.com>", "NEAR DevEx team"]
+description = "SLIP-0010 ed25519 private key derivation — NEAR fork of the slip10 crate"
 edition = "2021"
-keywords = ["slip-0010", "slip-10", "slip10"]
+keywords = ["slip-0010", "slip-10", "slip10", "near"]
 license = "MIT"
-name = "slip10"
+name = "near-slip10"
+repository = "https://github.com/vsavchyn-dev/near-slip10"
 readme = "README.md"
 version = "0.4.7"
 

@@ -1,7 +1,7 @@
 use core::str::FromStr;
 
 use hex::FromHex;
-use slip10::*;
+use near_slip10::*;
 
 #[test]
 fn test_ed25519() {
@@ -101,3 +101,4 @@ fn test_ed25519() {
         }
     }
 }
+
