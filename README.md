@@ -18,14 +18,17 @@ SLIP-0010 ed25519 HD key derivation for the NEAR ecosystem.
 use core::str::FromStr;
 use near_slip10::{derive_key_from_path, BIP32Path, Curve};
 
-// Seed bytes from a BIP-39 mnemonic, e.g. via the `bip39` crate.
-let seed: [u8; 64] = /* ... */;
-let path = BIP32Path::from_str("m/44'/397'/0'")?;
-let key = derive_key_from_path(&seed, Curve::Ed25519, &path)?;
+fn main() -> Result<(), near_slip10::Error> {
+    // Seed bytes from a BIP-39 mnemonic, e.g. via the `bip39` crate.
+    let seed: [u8; 64] = /* ... */;
+    let path = BIP32Path::from_str("m/44'/397'/0'")?;
+    let key = derive_key_from_path(&seed, Curve::Ed25519, &path)?;
 
-// `key.key` is the 32-byte ed25519 secret.
-// `key.public_key()` returns 33 bytes: a 0x00 prefix followed by the
-// 32-byte ed25519 public key, per SLIP-10 "Public key derivation".
+    // `key.key` is the 32-byte ed25519 secret.
+    // `key.public_key()` returns 33 bytes: a 0x00 prefix followed by the
+    // 32-byte ed25519 public key, per SLIP-10 "Public key derivation".
+    Ok(())
+}
 ```
 
 `BIP32Path` accepts both `'` and `H` as hardened markers and round-trips through `Display` as `m/44'/397'/0'`.
@@ -52,7 +55,7 @@ Works in `no_std` environments with `alloc`.
 The test suite verifies the official SLIP-10 ed25519 test vectors:
 
 - Test Vector 1, seed `000102030405060708090a0b0c0d0e0f`
-- Test Vector 2, seed `fffcf9f6...c4c4c4842` (the long random seed from the spec)
+- Test Vector 2, the long random seed from the SLIP-0010 spec
 
 ## Security
 
