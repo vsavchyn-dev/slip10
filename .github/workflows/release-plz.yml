@@ -1,0 +1,92 @@
+name: Release-plz
+
+# Trusted publishing to crates.io via OIDC.
+# See RELEASING.md for the one-time crates.io UI setup the maintainer must
+# perform before the first release through this workflow.
+
+on:
+  push:
+    branches:
+      - master
+
+# Top-level permissions are intentionally minimal; per-job blocks below grant
+# only what each job needs.
+permissions: {}
+
+jobs:
+  # Opens / updates the "release PR" that bumps versions and updates the
+  # changelog. Does not publish.
+  release-plz-pr:
+    name: Release-plz PR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    concurrency:
+      group: release-plz-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run release-plz (release-pr)
+        uses: release-plz/action@v0.5
+        with:
+          command: release-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Publishes any unpublished package versions on master to crates.io and
+  # creates the matching GitHub release. Authenticates to crates.io via
+  # OIDC trusted publishing — no CARGO_REGISTRY_TOKEN secret is used.
+  release-plz-release:
+    name: Release-plz release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+      # Required for OIDC trusted publishing to crates.io. release-plz mints
+      # a short-lived token from the OIDC token internally — see
+      # https://release-plz.dev/docs/github/quickstart
+      id-token: write
+      # Required so actions/attest-build-provenance can write the
+      # attestation back to the workflow run.
+      attestations: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run release-plz (release)
+        id: release-plz
+        uses: release-plz/action@v0.5
+        with:
+          command: release
+        env:
+          # No CARGO_REGISTRY_TOKEN: release-plz uses OIDC trusted publishing
+          # automatically when id-token: write is set on the job and no
+          # CARGO_REGISTRY_TOKEN env var is present.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Best-effort sigstore build provenance attestation for the published
+      # crate tarball. release-plz does not currently expose the path to the
+      # .crate file it produced (see RELEASING.md "Follow-ups"), so we
+      # re-package locally only when something was actually released and
+      # attest that artifact. The published tarball is bit-for-bit
+      # reproducible from the same commit, so the attestation still binds
+      # the published artifact to this workflow run.
+      - name: Re-package crate for attestation
+        if: steps.release-plz.outputs.releases_created == 'true'
+        run: cargo package --no-verify
+      - name: Attest build provenance
+        if: steps.release-plz.outputs.releases_created == 'true'
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: target/package/*.crate
